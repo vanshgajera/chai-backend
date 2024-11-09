@@ -46,6 +46,9 @@ const userSchama = new mongoose.Schema(
         refreshToken: {
             type: String 
         }
+        // accessToken: {
+        //     type: String
+        // }, // this is not show to accessToken data base to mongodb
 
     },
     {timestamps: true}
