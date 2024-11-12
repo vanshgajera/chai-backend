@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs";
+import { ApiError } from './ApiError';
 
 
 cloudinary.config({
@@ -29,24 +30,28 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
-// const uploadOnCloudinary = async (localFilePath) => {
-//   try {
-//     if(!localFilePath) return null
-//     const response = await cloudinary.uploader.upload(localFilePath, {
-//       // Add any necessary options like folder, public_id, etc.
-//        resource_type: "auto",
-//        folder: 'your_folder_name' // Replace with your desired folder
-//     });
-//     fs.unlinkSync(localFilePath);
-//     // return result.secure_url;
-//     return response;
-    
-//   } catch (error) {
-//     console.error("Cloudinary upload error:", error);
-//     fs.unlinkSync(localFilePath); // Ensure file cleanup
-//     throw new Error('Cloudinary upload failed'); // Handle error appropriately
-//   }
-// };
+const deleteFromCloudinary = async (imageUrl) => {
+   try {
+        if(!imageUrl) {
+            throw new ApiError(400, "Image URL is required for deletion");
+        }
 
-export {uploadOnCloudinary}
+        const publicId = imageUrl.split('/').pop().split('.')[0];
+
+        const response = await cloudinary.uploader.destroy(publicId);
+
+        if (response.result !== 'ok') {
+            throw new ApiError(500, "Failed to delete image from Cloudinary");
+        }
+
+        console.log("Image successfully deleted from Cloudinary:", publicId);
+        return response;
+
+   } catch (error) {
+        console.error("Error deleting image from Cloudinary:", error);
+        throw new ApiError(500, "Error deleting image from Cloudinary");
+   }
+}
+
+export {uploadOnCloudinary,deleteFromCloudinary}
 
