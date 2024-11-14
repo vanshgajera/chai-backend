@@ -4,8 +4,6 @@ import { User } from "../models/user.model.js";
 import { deleteFromCloudinary, uploadOnCloudinary} from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken"
-import { response } from "express";
-import { emit } from "nodemon";
 import mongoose from "mongoose";
 
 const genrateAccessAndRefereshTokens = async(userId)=>
@@ -189,8 +187,12 @@ const logoutUser = asyncHandler(async (req, res)=>{
    await User.findByIdAndUpdate(
       req.user._id,
       {
-         $set: {
-            refreshToken: undefined
+         // $set: {
+         //    refreshToken: undefined
+         // }
+
+         $unset:{
+            refreshToken: 1 // this removes the field from document
          }
       },
       {
@@ -238,7 +240,7 @@ const refreshAccessToken = asyncHandler(async (req, res)=>{
    
       const options = {
          httpOnly: true,
-         secure: true
+         secure: false
       }
    
       const {accessToken, newRefreshToken} = await genrateAccessAndRefereshTokens(user._id)
