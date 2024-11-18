@@ -30,6 +30,8 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
+
+
 const deleteFromCloudinary = async (imageUrl) => {
    try {
         if(!imageUrl) {

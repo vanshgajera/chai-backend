@@ -463,7 +463,7 @@ const getWatchHistory = asyncHandler(async (req, res)=> {
          $match: {
             _id: mongoose.Types.ObjectId(req.user._id)
          }
-      },
+      },   
       {
          $lookup: {
             from: "videos",
