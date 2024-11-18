@@ -117,56 +117,56 @@ const getAllVideos = asyncHandler(async (req, res) => {
 });
 
 
-// const publishAVideo = asyncHandler(async (req, res) => {
-//     // const { title, description} = req.body
-//     // TODO: get video, upload to cloudinary, create video
+const publishAVideo = asyncHandler(async (req, res) => {
+    // const { title, description} = req.body
+    // TODO: get video, upload to cloudinary, create video
 
-//     const {title, description} = req.body
+    const {title, description} = req.body
     
 
-//     try {
-//         const thumbnailLocalPath = req.files?.thumbnail[0]?.path
-//         const videoFileLocalPath = req.files?.videoFile[0]?.path
+    try {
+        const thumbnailLocalPath = req.files?.thumbnail[0]?.path
+        const videoFileLocalPath = req.files?.videoFile[0]?.path
     
-//         if(
-//             [title,description,thumbnailLocalPath,videoFileLocalPath].some(
-//                 (field) => field?.trim() === "")
-//         ) {
-//             throw new ApiError(400, "All publishAVideo field are required!");
-//         }
+        if(
+            [title,description,thumbnailLocalPath,videoFileLocalPath].some(
+                (field) => field?.trim() === "")
+        ) {
+            throw new ApiError(400, "All publishAVideo field are required!");
+        }
     
-//         const thumbnail = await uploadOnCloudinary(thumbnailLocalPath)
-//         const videoFile = await uploadOnCloudinary(videoFileLocalPath)
+        const thumbnail = await uploadOnCloudinary(thumbnailLocalPath)
+        const videoFile = await uploadOnCloudinary(videoFileLocalPath)
     
-//         if(!thumbnail) {
-//             throw new ApiError(400, "Thumbnail link is required")
-//         }
+        if(!thumbnail) {
+            throw new ApiError(400, "Thumbnail link is required")
+        }
     
-//         if (!videoFile) {
-//             throw new ApiError(400, "VideoFile link is required");
-//         }
+        if (!videoFile) {
+            throw new ApiError(400, "VideoFile link is required");
+        }
     
-//         const video = await Video.create({
-//             videoFile: videoFile.secure_url,
-//             thumbnail: thumbnail.secure_url,
-//             title,
-//             description,
-//             duration: videoFile.duration,
-//             isPublished: true,
-//             owner: req.user?._id,
-//         });
+        const video = await Video.create({
+            videoFile: videoFile.secure_url,
+            thumbnail: thumbnail.secure_url,
+            title,
+            description,
+            duration: videoFile.duration,
+            isPublished: true,
+            owner: req.user?._id,
+        });
     
-//         if(!video) {
-//             throw new ApiError(500, "Something went wrong while uploading the video.")
-//         }
+        if(!video) {
+            throw new ApiError(500, "Something went wrong while uploading the video.")
+        }
     
-//         return res
-//         .status(200)
-//         .json(new ApiResponse(200, video,"Video published successfully"))
-//     } catch (error) {
-//         throw new ApiError(500, 'Error uploading video to cloudinary', error.message)
-//     }
-// })
+        return res
+        .status(200)
+        .json(new ApiResponse(200, video,"Video published successfully"))
+    } catch (error) {
+        throw new ApiError(500, 'Error uploading video to cloudinary', error.message)
+    }
+})
 
 // const   getVideoById = asyncHandler(async (req, res) => {
 //     // const { videoId } = req.params
