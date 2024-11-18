@@ -168,33 +168,33 @@ const publishAVideo = asyncHandler(async (req, res) => {
     }
 })
 
-// const   getVideoById = asyncHandler(async (req, res) => {
-//     // const { videoId } = req.params
-//     //TODO: get video by id
+const   getVideoById = asyncHandler(async (req, res) => {
+    // const { videoId } = req.params
+    //TODO: get video by id
 
-//     const { videoId } = req.params
+    const { videoId } = req.params
 
-//    try {
+   try {
  
-//      if(!isValidObjectId(videoId)) {
-//          throw new ApiError(400, "Invalid VideoID")
-//      }
+     if(!isValidObjectId(videoId)) {
+         throw new ApiError(400, "Invalid VideoID")
+     }
  
-//      const video = await Video.findById(videoId)
+     const video = await Video.findById(videoId)
  
-//      if(!video) {
-//          throw new ApiError(400, "Failed to get Video details")
-//      }
+     if(!video) {
+         throw new ApiError(400, "Failed to get Video details")
+     }
  
-//      return res
-//      .status(200)
-//      .json(
-//          new ApiResponse(200, video , "Video details fetched successfully")
-//      )
-//    } catch (error) {
-//         throw new ApiError(500, 'Error video get details failed', error.message)
-//    }
-// })
+     return res
+     .status(200)
+     .json(
+         new ApiResponse(200, video , "Video details fetched successfully")
+     )
+   } catch (error) {
+        throw new ApiError(500, 'Error video get details failed', error.message)
+   }
+})
 
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
