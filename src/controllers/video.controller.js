@@ -222,7 +222,7 @@ const updateVideo = asyncHandler(async (req, res) => {
             );
         }
 
-        thumbnail = thumbnail.secure_url
+        thumbnail = thumbnail.secure_url  // Save only the URL
     }
 
     const responce = await Video.findByIdAndUpdate(
@@ -250,13 +250,62 @@ const updateVideo = asyncHandler(async (req, res) => {
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
+    // const { videoId } = req.params
     //TODO: delete video
+
+    const { videoId } = req.params
+
+    if(!isValidObjectId(videoId)) {
+        throw new ApiError(402, "Invalid VideoId")
+    }
+
+    const deleteResponce = await Video.deleteOne({
+        _id: mongoose.Types.ObjectId(videoId)
+    })
+
+    if (!deleteResponce) {
+        throw new ApiError(400, "Error while deteing video from db");
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, deleteResponce, "Video deleted succesfully.")
+    );d
+
 })
 
+
 const togglePublishStatus = asyncHandler(async (req, res) => {
-    const { videoId } = req.params
-})
+    const { videoId } = req.params;
+
+    // Validate videoId
+    if (!videoId) {
+        throw new ApiError(400, "Video ID is required.");
+    }
+
+    // Find the video by ID
+    const videotoggle = await Video.findById(videoId);
+
+    if (!videotoggle) {
+        throw new ApiError(404, "Video not found.");
+    }
+
+    // Toggle the `ispublished` status
+    videotoggle.ispublished = !videotoggle.ispublished;
+
+    // Save the changes
+    await videotoggle.save();
+
+    // Respond with updated video
+    return res.status(200).json({
+        statusCode: 200,
+        data: videotoggle,
+        message: "Published toggled successfully",
+        success: true,
+    });
+});
+
 
 export {
     getAllVideos,
