@@ -83,10 +83,63 @@ const getUserTweets = asyncHandler(async (req, res) => {
 
 const updateTweet = asyncHandler(async (req, res) => {
     //TODO: update tweet
+
+    const { content } = req.body
+    const { tweetId } = req.params
+
+    // Debugging
+    // console.log("req.params:", req.params); // Check if tweetID exists
+    // console.log("tweetID:", tweetId); // Check tweetID value
+    // console.log("req.body:", req.body); // Check if content is provided
+    
+
+    if(content?.trim() === "") {
+        throw new ApiError(400, "Content is missing")
+    }
+
+    if (!mongoose.isValidObjectId(tweetId)) {
+        throw new ApiError(400, "Invalid Tweet ID.");
+    }
+
+    const tweet = await Tweet.findByIdAndUpdate(
+        tweetId,
+        {
+            $set: {
+                content
+            },
+        },
+        {
+            new: true
+        }
+    )
+
+    if(!tweet) {
+        throw new ApiError(404, "tweet is not found")
+    }
+
+    return res
+    .status(201)
+    .json(new ApiResponse(200, tweet, "Tweet updated succesfully"))
 })
 
 const deleteTweet = asyncHandler(async (req, res) => {
     //TODO: delete tweet
+
+    const { tweetId } = req.params
+
+    if(!tweetId) {
+        throw new ApiError(401, "Invalid tweetID")
+    }
+
+    const Deltweet = await Tweet.findByIdAndDelete(tweetId)
+
+    if(!Deltweet) {
+        throw new ApiError(500, "Something went wrong while deleting Tweet")
+    }
+
+    return res
+    .status(201)
+    .json(new ApiResponse(200, Deltweet, "Tweet deleted successfully "))
 })
 
 export {
