@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose, { isValidObjectId } from "mongoose"
 import {Comment} from "../models/comment.model.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
@@ -80,16 +80,16 @@ const getVideoComments = asyncHandler(async (req, res) => {
     }
 
 
-    const result = await Comment.aggregatePaginate(getAllComments, { page, limit });
+    const totalComments = await Comment.aggregatePaginate(getAllComments, { page, limit });
 
-    if (result.docs.length == 0) {
+    if (totalComments.docs.length == 0) {
         return res.status(200).json(new ApiResponse(200, [], "No Comments Found"));
     }
 
     return res
         .status(200)
         .json(
-            new ApiResponse(200, result.docs, "Comments fetched Succesfully !")
+            new ApiResponse(200, totalComments.docs, "Comments fetched Succesfully !")
         );
 
 })
@@ -98,14 +98,90 @@ const getVideoComments = asyncHandler(async (req, res) => {
 
 const addComment = asyncHandler(async (req, res) => {
     // TODO: add a comment to a video
+
+    const { videoId } = req.params
+
+    const { content } = req.body
+
+    if(!isValidObjectId(videoId)) {
+        throw new ApiError(401, "Invalid videoID")
+    }
+
+    const newComment = await Comment.create(
+        {
+            content,
+            video: videoId,
+            owner: req.user?._id
+        }
+    )
+
+    if(!newComment) {
+        throw new ApiError(400, "Something went wrong while adding comment")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, newComment, "Successfully added comment")
+    )
 })
 
 const updateComment = asyncHandler(async (req, res) => {
     // TODO: update a comment
+
+    // const { commentId } = req.params
+    const { commentId } = req.params    
+    const { content } = req.body
+    
+    if(content?.trim() === "") {
+        throw new ApiError(400, "Empty comment not allowed")
+    }
+
+    if(!isValidObjectId(commentId)) {
+        throw new ApiError(400, "Invalid commentID")
+    }
+
+    const newcomment = await Comment.findByIdAndUpdate(
+        commentId,
+        {
+            content
+        },
+        {
+            new: true
+        }
+    )
+
+    if(!newcomment) {
+        throw new ApiError(400, "Something went wrong while updating comment")
+    }
+
+    return res
+    .status(201)
+    .json(
+        new ApiResponse(200,newcomment, "Successfully Updated Comment")
+    )
 })
 
 const deleteComment = asyncHandler(async (req, res) => {
     // TODO: delete a comment
+
+    const { commentId } = req.params
+
+    if(!isValidObjectId(commentId)) {
+        throw new ApiError(400, "Invalid commentID")
+    }
+
+    const delcomment = await Comment.findByIdAndDelete(commentId)
+
+    if(!delcomment) {
+        throw new ApiError(400, "Something went wrong while Deleting comment")
+    }
+
+    return res
+    .status(201)
+    .json(
+        new ApiResponse(200, delcomment, "Succesfully deleted comment")
+    )
 })
 
 export {
