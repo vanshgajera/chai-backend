@@ -37,8 +37,6 @@ const toggleSubscription = asyncHandler(async (req, res) => {
         console.log(Subscription);
      }
 
-     
-
      return res
      .status(201)
     .json(new ApiResponse(200, {}, "Subscription toggle successfully"))
@@ -47,12 +45,78 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 
 // controller to return subscriber list of a channel
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
-    const {channelId} = req.params
+    // const {channelId} = req.params
+
+    const { subscriberId } = req.params    
+
+    if(!isValidObjectId(subscriberId)) {
+        throw new ApiError(400, "channelId is required")
+    }
+
+    const subscription = await Subscription.aggregate([
+        {
+            $match: {
+                subscriber: new mongoose.Types.ObjectId(`${subscriberId}`)
+            }
+        }
+    ])
+
+    const subscriberCount = subscription.length
+
+    return res
+    .status(201)
+    .json(
+        new ApiResponse(200, subscriberCount, "Successfully fetched number of subsciber of the given channelID")
+    )
 })
 
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
-    const { subscriberId } = req.params
+    // const { subscriberId } = req.params
+
+    const { channelId } = req.params
+
+    if(!isValidObjectId(channelId)) {
+        throw new ApiError(400, "SubsciberID is required")
+    }
+
+    const channel = await Subscription.aggregate([
+        {
+            $match: {
+                subscriber: new mongoose.Types.ObjectId(`${channelId}`)
+            }
+        },
+        {
+            $lookup:{
+                from: "users",
+                localField: "channel",
+                foreignField: "_id",
+                as: "details",
+                pipeline: [
+                    {
+                        $project: {
+                            fullName: 1,
+                            avatar: 1,
+                            username: 1,
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $addFields: {
+                details: {
+                    $first: "$details",
+                }
+            }
+        }
+    ])
+
+    return res
+    .status(201)
+    .json(
+        new ApiResponse(200, channel,  "Succesfully fetched number of subscribed channels for the given subscriberID.")
+    )
 })
 
 export {
