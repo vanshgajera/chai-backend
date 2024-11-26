@@ -59,11 +59,22 @@ const getUserTweets = asyncHandler(async (req, res) => {
                     ]
                 }
             },
+            // {
+            //     $lookup: {
+            //         from: "likes",
+            //         localField: "_id",
+            //         foreignField: "tweet",
+            //         as: "NumLikes",
+            //     }
+            // },
             {
               $addFields: {
                 owner: {
                     $first: "$owner"
-                }
+                },
+                // likes: {
+                //     $size: "$NumLikes",
+                // }
               }  
             }
         ])

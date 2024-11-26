@@ -306,6 +306,36 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
     });
 });
 
+const incrementViewCount = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+
+    // Validate video ID
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid Video ID");
+    }
+
+    try {
+        // Find the video by ID and increment views atomically
+        const video = await Video.findByIdAndUpdate(
+            videoId,
+            { $inc: { views: 1 } }, // Increment the views by 1
+            { new: true } // Return the updated document
+        );
+
+        // If the video is not found
+        if (!video) {
+            throw new ApiError(404, "Video not found");
+        }
+
+        // Return the updated video with the new view count
+        return res.status(200).json(
+            new ApiResponse(200, video, "View count incremented successfully")
+        );
+    } catch (error) {
+        throw new ApiError(500, "Failed to increment view count", error.message);
+    }
+});
+
 
 export {
     getAllVideos,
@@ -313,5 +343,6 @@ export {
     getVideoById,
     updateVideo,
     deleteVideo,
-    togglePublishStatus
+    togglePublishStatus,
+    incrementViewCount
 }
