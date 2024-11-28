@@ -34,7 +34,8 @@ const videoSchema = new mongoose.Schema(
         owner: {
             type: Schema.Types.ObjectId,
             ref: "User"
-        }
+        },
+        likesCount: { type: Number, default: 0 }, // Initialize with 0
 
     },
     {

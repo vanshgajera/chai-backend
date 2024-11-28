@@ -162,6 +162,8 @@ const loginUser = asyncHandler( async (req, res) => {
    // }
 
    // Set options for the cookies
+   try{
+
       const options = {
          httpOnly: true,
          secure: false, // This will enforce cookies to be sent over HTTPS
@@ -181,6 +183,10 @@ const loginUser = asyncHandler( async (req, res) => {
          "User logged In Successfully"
       )
    )
+   }catch(err){
+console.log(err);
+
+   }
 })
 
 const logoutUser = asyncHandler(async (req, res)=>{
