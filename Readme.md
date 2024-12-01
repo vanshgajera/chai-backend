@@ -6,7 +6,8 @@ Project uses all standard practices like JWT, bcrypt, access tokens, refresh Tok
 This is a video serios on backend with javascript
 
 
-Summary of the Project:
+
+<h1>Summary of the Project:</h1>
 Project Overview
 This is a Node.js backend application for a YouTube-like platform where users can:
 
