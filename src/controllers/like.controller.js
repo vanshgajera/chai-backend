@@ -156,17 +156,17 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     })
 })
 
-const getLikedVideos = asyncHandler(async (req, res) => {
-    const userId = req.user.id;
+// const getLikedVideos = asyncHandler(async (req, res) => {
+//     const userId = req.user.id;
 
-    // Find all likes on videos by the user
-    const likes = await Like.find({ likedBy: userId, video: { $exists: true } })
-        .populate("video") // Populate video details
-        .exec();
+//     // Find all likes on videos by the user
+//     const likes = await Like.find({ likedBy: userId, video: { $exists: true } })
+//         .populate("video") // Populate video details
+//         .exec();
 
-    const likedVideos = likes.map((like) => like.video); // Extract video details
-    return res.status(200).json(new ApiResponse(200, "Liked videos retrieved successfully.", likedVideos));
-});
+//     const likedVideos = likes.map((like) => like.video); // Extract video details
+//     return res.status(200).json(new ApiResponse(200, "Liked videos retrieved successfully.", likedVideos));
+// });
 
 
 
