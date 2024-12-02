@@ -108,7 +108,7 @@ const updateTweet = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Content is missing")
     }
 
-    if (!mongoose.isValidObjectId(tweetId)) {
+    if (!isValidObjectId(tweetId)) {
         throw new ApiError(400, "Invalid Tweet ID.");
     }
 

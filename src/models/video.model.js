@@ -36,6 +36,7 @@ const videoSchema = new mongoose.Schema(
             ref: "User"
         },
         likesCount: { type: Number, default: 0 }, // Initialize with 0
+        // likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Array of user IDs who liked the video
 
     },
     {

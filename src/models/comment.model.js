@@ -14,7 +14,8 @@ const commentSchema = new Schema(
         owner: {
             type: Schema.Types.ObjectId,
             ref: "User"
-        }
+        },
+        likesCount: { type: Number, default: 0 }, // Initialize with 0
     },
     {
         timestamps: true
