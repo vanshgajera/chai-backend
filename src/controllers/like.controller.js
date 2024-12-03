@@ -156,19 +156,72 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     })
 })
 
-// const getLikedVideos = asyncHandler(async (req, res) => {
-//     const userId = req.user.id;
-
-//     // Find all likes on videos by the user
-//     const likes = await Like.find({ likedBy: userId, video: { $exists: true } })
-//         .populate("video") // Populate video details
-//         .exec();
-
-//     const likedVideos = likes.map((like) => like.video); // Extract video details
-//     return res.status(200).json(new ApiResponse(200, "Liked videos retrieved successfully.", likedVideos));
-// });
-
-
+const getLikedVideos = asyncHandler(async (req, res) => {
+    //TODO: get all liked videos
+    const userID = req.user?._id;
+  
+    if (!isValidObjectId(userID)) {
+        throw new ApiError(401, "Invalid userID");
+    }
+  
+    const likedVideo = await Like.aggregate([
+        {
+            $match: {
+                $and: [
+                    {likedBy: new mongoose.Types.ObjectId(`${userID}`)},
+                    {video: {$exists: true}}
+                ]
+            },
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "video",
+                foreignField: "_id",
+                as: "video",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        fullname: 1,
+                                        username: 1,
+                                        avatar: 1,
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                    {
+                        $addFields: {
+                            owner: {
+                                $first: "$owner",
+                            },
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $addFields: {
+                details: {
+                    $first: "$video"
+                }
+            }
+        },
+    ]);
+  
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, likedVideo, "Succesfully fetched liked videos")
+        );
+  })
 
 
 export {
