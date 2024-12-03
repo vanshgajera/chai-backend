@@ -189,7 +189,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
                             pipeline: [
                                 {
                                     $project: {
-                                        fullname: 1,
+                                        fullName: 1,
                                         username: 1,
                                         avatar: 1,
                                     },
