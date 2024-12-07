@@ -158,7 +158,7 @@ const loginUser = asyncHandler( async (req, res) => {
 
    // const options = {
    //    httpOnly: true,
-   //    secure: true,
+   //    secure: true, // this is live to website and https to working to now.
    // }
 
    // Set options for the cookies
@@ -217,7 +217,7 @@ const logoutUser = asyncHandler(async (req, res)=>{
    .clearCookie("refreshToken", options)
    .json(new ApiResponse(200, {}, "User logged Out"))
    
-
+   
 })
 
 const refreshAccessToken = asyncHandler(async (req, res)=>{
@@ -246,7 +246,7 @@ const refreshAccessToken = asyncHandler(async (req, res)=>{
    
       const options = {
          httpOnly: true,
-         secure: false
+         secure: false // This will enforce cookies to be sent over HTTPS
       }
    
       const {accessToken, newRefreshToken} = await genrateAccessAndRefereshTokens(user._id)
@@ -335,13 +335,19 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
    
    // ToDo: delete old image - assigment
 
-   const oldAvatarUrl = user.avatar;
+   const  user = await User.findById(req.user?._id);
+
+   if (!user) {
+      throw new ApiError(404, "User not found");
+   }
+
+   const oldAvatarUrl = user?.avatar[0]?.path;
 
    if (oldAvatarUrl) {
       await deleteFromCloudinary(oldAvatarUrl); // Assuming you have a function for this
    }
 
-   const user = await User.findByIdAndUpdate(
+   const updatedUser = await User.findByIdAndUpdate(
       req.user?._id,
       {
          $set:{
@@ -354,7 +360,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
    return res
    .status(200)
    .json(
-      new ApiResponse(200, user, "Avatar image updated successfully")
+      new ApiResponse(200, updatedUser, "Avatar image updated successfully")
    )
 })
 

@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs";
 import { ApiError } from './ApiError.js';
+import { log } from 'console';
 
 
 cloudinary.config({
@@ -33,6 +34,8 @@ const uploadOnCloudinary = async (localFilePath) => {
 
 
 const deleteFromCloudinary = async (imageUrl) => {
+
+    console.log(imageUrl)
    try {
         if(!imageUrl) {
             throw new ApiError(400, "Image URL is required for deletion");
